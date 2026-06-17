@@ -35,8 +35,8 @@ const loadPosters = async () => {
   if (!posters.length) {
     document.querySelector(".home-gallery").innerHTML = `
       <div class="home-empty">
-        <strong>Nessun poster ancora generato</strong>
-        <span>Apri lo studio e crea il primo.</span>
+        <strong>No posters generated yet</strong>
+        <span>Open the studio and create the first one.</span>
       </div>
     `;
     return;
@@ -51,8 +51,8 @@ const loadPosters = async () => {
 loadPosters().catch(() => {
   document.querySelector(".home-gallery").innerHTML = `
     <div class="home-empty">
-      <strong>Galleria non disponibile</strong>
-      <span>Puoi comunque aprire lo studio.</span>
+      <strong>Gallery unavailable</strong>
+      <span>You can still open the studio.</span>
     </div>
   `;
 });

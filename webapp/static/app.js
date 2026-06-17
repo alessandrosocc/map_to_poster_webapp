@@ -26,10 +26,10 @@ const THEME_PREVIEW_DELAY = 350;
 const DEFAULT_DISTANCE = 18000;
 
 const cityNotFoundMessage = () => {
-  const city = form.elements.city.value.trim() || "questa citta";
+  const city = form.elements.city.value.trim() || "this city";
   const country = form.elements.country.value.trim();
   const place = country ? `${city}, ${country}` : city;
-  return `Non ho trovato ${place}. Controlla il nome della citta o inserisci latitudine e longitudine.`;
+  return `I could not find ${place}. Check the city name or enter latitude and longitude.`;
 };
 
 const setStatus = (message) => {
@@ -37,11 +37,11 @@ const setStatus = (message) => {
 };
 
 const displayError = (message) => {
-  const text = String(message || "Errore");
+  const text = String(message || "Error");
   if (
     text.includes("Could not find coordinates")
     || text.includes("Geocoding failed")
-    || text.includes("Localizzazione non riuscita")
+    || text.includes("Could not locate")
   ) {
     setStatus(cityNotFoundMessage());
     return;
@@ -188,8 +188,8 @@ const renderDownloads = (job) => {
     finalButton.type = "button";
     finalButton.className = "download-action";
     finalButton.textContent = form.elements.allThemes.checked
-      ? `Genera ZIP ${formatInput.value.toUpperCase()} (${outputImageCount()} immagini)`
-      : `Scarica ${formatInput.value.toUpperCase()} finale`;
+      ? `Generate ZIP ${formatInput.value.toUpperCase()} (${outputImageCount()} images)`
+      : `Download final ${formatInput.value.toUpperCase()}`;
     finalButton.addEventListener("click", () => startGeneration({ previewOnly: false, keepPreview: true }));
     downloadArea.append(finalButton);
     return;
@@ -211,12 +211,12 @@ const renderDownloads = (job) => {
   if (job.archiveUrl) {
     const archive = document.createElement("a");
     archive.href = job.archiveUrl;
-    archive.textContent = "Scarica ZIP";
+    archive.textContent = "Download ZIP";
     downloadArea.append(archive);
   } else if (job.files[0]) {
     const link = document.createElement("a");
     link.href = job.files[0].downloadUrl;
-    link.textContent = "Scarica file";
+    link.textContent = "Download file";
     downloadArea.append(link);
   }
 };
@@ -270,7 +270,7 @@ const pollJob = async (jobId, token) => {
 
 const startGeneration = async ({ previewOnly = false, keepPreview = false } = {}) => {
   if (!form.elements.city.value.trim() || !form.elements.country.value.trim()) {
-    setStatus("Compila citta e paese");
+    setStatus("Fill in city and country");
     return;
   }
 
@@ -287,11 +287,11 @@ const startGeneration = async ({ previewOnly = false, keepPreview = false } = {}
   }
   setPreviewLoading(previewOnly);
   if (previewOnly) {
-    setStatus("Stiamo generando l'immagine qui sopra");
+    setStatus("Generating the preview above");
   } else if (form.elements.allThemes.checked) {
-    setStatus(`Preparazione ZIP: ${outputImageCount()} immagini da generare`);
+    setStatus(`Preparing ZIP: ${outputImageCount()} images to generate`);
   } else {
-    setStatus("Preparazione file finale");
+    setStatus("Preparing final file");
   }
 
   const payloadToSend = formPayload(previewOnly ? { allThemes: false, previewOnly: true } : {});
@@ -304,7 +304,7 @@ const startGeneration = async ({ previewOnly = false, keepPreview = false } = {}
 
   if (!response.ok) {
     if (token !== activeJobToken) return;
-    displayError(payload.error || "Errore");
+    displayError(payload.error || "Error");
     setPreviewLoading(false);
     return;
   }
@@ -325,7 +325,7 @@ const scheduleGeneration = ({ previewOnly = false, delay = THEME_PREVIEW_DELAY }
     }
     downloadArea.replaceChildren();
     setPreviewLoading(false);
-    setStatus("Aggiornamento preview in arrivo");
+    setStatus("Preview update queued");
   }
   generationDebounceTimer = setTimeout(() => {
     generationDebounceTimer = null;

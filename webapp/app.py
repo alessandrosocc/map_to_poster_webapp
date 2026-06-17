@@ -46,7 +46,7 @@ from lat_lon_parser import parse  # noqa: E402
 class Job:
     id: str
     status: str = "queued"
-    progress: str = "In coda"
+    progress: str = "Queued"
     files: list[Path] = field(default_factory=list)
     archive: Path | None = None
     error: str | None = None
@@ -163,11 +163,11 @@ def coerce_float(value: Any, name: str, minimum: float | None = None, maximum: f
     try:
         number = float(value)
     except (TypeError, ValueError) as exc:
-        raise ValueError(f"{name} non valido") from exc
+        raise ValueError(f"{name} is invalid") from exc
     if minimum is not None and number < minimum:
-        raise ValueError(f"{name} deve essere almeno {minimum}")
+        raise ValueError(f"{name} must be at least {minimum}")
     if maximum is not None and number > maximum:
-        raise ValueError(f"{name} deve essere al massimo {maximum}")
+        raise ValueError(f"{name} must be at most {maximum}")
     return number
 
 
@@ -175,11 +175,11 @@ def coerce_int(value: Any, name: str, minimum: int | None = None, maximum: int |
     try:
         number = int(value)
     except (TypeError, ValueError) as exc:
-        raise ValueError(f"{name} non valido") from exc
+        raise ValueError(f"{name} is invalid") from exc
     if minimum is not None and number < minimum:
-        raise ValueError(f"{name} deve essere almeno {minimum}")
+        raise ValueError(f"{name} must be at least {minimum}")
     if maximum is not None and number > maximum:
-        raise ValueError(f"{name} deve essere al massimo {maximum}")
+        raise ValueError(f"{name} must be at most {maximum}")
     return number
 
 
@@ -220,16 +220,16 @@ def generate_job(job_id: str, payload: dict[str, Any]) -> None:
         city = str(payload.get("city", "")).strip()
         country = str(payload.get("country", "")).strip()
         if not city or not country:
-            raise ValueError("Citta e paese sono obbligatori")
+            raise ValueError("City and country are required")
 
         preview_only = bool(payload.get("previewOnly", False))
         output_format = "png" if preview_only else str(payload.get("format", "png")).lower()
         if output_format not in {"png", "svg", "pdf"}:
-            raise ValueError("Formato non supportato")
+            raise ValueError("Unsupported format")
 
-        distance = coerce_int(payload.get("distance", 18000), "Distanza", 1000, 50000)
-        width = coerce_float(payload.get("width", 12), "Larghezza", 1, 50)
-        height = coerce_float(payload.get("height", 16), "Altezza", 1, 50)
+        distance = coerce_int(payload.get("distance", 18000), "Distance", 1000, 50000)
+        width = coerce_float(payload.get("width", 12), "Width", 1, 50)
+        height = coerce_float(payload.get("height", 16), "Height", 1, 50)
         dpi = 140 if preview_only else 300
         if preview_only:
             smaller_side = min(width, height)
@@ -244,40 +244,40 @@ def generate_job(job_id: str, payload: dict[str, Any]) -> None:
         themes = available_themes if all_themes else [theme]
         missing = [item for item in themes if item not in available_themes]
         if missing:
-            raise ValueError(f"Tema non trovato: {', '.join(missing)}")
+            raise ValueError(f"Theme not found: {', '.join(missing)}")
 
-        set_job(job_id, status="running", progress="In coda")
+        set_job(job_id, status="running", progress="Queued")
         with generation_lock:
-            set_job(job_id, progress="Localizzazione")
+            set_job(job_id, progress="Locating city")
             latitude = str(payload.get("latitude", "")).strip()
             longitude = str(payload.get("longitude", "")).strip()
             if latitude and longitude:
                 coords = (parse(latitude), parse(longitude))
             elif latitude or longitude:
-                raise ValueError("Latitudine e longitudine vanno compilate insieme")
+                raise ValueError("Latitude and longitude must be filled in together")
             else:
                 try:
                     coords = poster.get_coordinates(city, country)
                 except ValueError as exc:
-                    raise ValueError(f"Localizzazione non riuscita: {city}, {country}") from exc
+                    raise ValueError(f"Could not locate: {city}, {country}") from exc
 
             font_family = str(payload.get("fontFamily", "")).strip()
             fonts = None
             if font_family:
-                set_job(job_id, progress="Caricamento font")
+                set_job(job_id, progress="Loading font")
                 fonts = load_fonts(font_family)
 
             files = []
             for index, theme_name in enumerate(themes, start=1):
                 remaining = len(themes) - index
                 if len(themes) > 1:
-                    remaining_label = "ultima immagine" if remaining == 0 else f"mancano {remaining} immagini"
+                    remaining_label = "last image" if remaining == 0 else f"{remaining} images left"
                     set_job(
                         job_id,
-                        progress=f"Generazione {index}/{len(themes)}: {theme_name} ({remaining_label})",
+                        progress=f"Generating {index}/{len(themes)}: {theme_name} ({remaining_label})",
                     )
                 else:
-                    set_job(job_id, progress=f"Generazione: {theme_name}")
+                    set_job(job_id, progress=f"Generating: {theme_name}")
                 poster.THEME = poster.load_theme(theme_name)
                 if preview_only:
                     output_file = PREVIEW_DIR / f"{preview_cache_key(payload)}.png"
@@ -310,10 +310,10 @@ def generate_job(job_id: str, payload: dict[str, Any]) -> None:
                     for path in files:
                         zip_file.write(path, arcname=path.name)
 
-        set_job(job_id, status="done", progress="Completato", files=files, archive=archive)
+        set_job(job_id, status="done", progress="Completed", files=files, archive=archive)
     except Exception as exc:  # pragma: no cover - surfaced through the UI
         traceback.print_exc()
-        set_job(job_id, status="error", progress="Errore", error=str(exc))
+        set_job(job_id, status="error", progress="Error", error=str(exc))
 
 
 class AppHandler(SimpleHTTPRequestHandler):
@@ -367,7 +367,7 @@ class AppHandler(SimpleHTTPRequestHandler):
             job_id = path.removeprefix("/api/jobs/").strip("/")
             snapshot = snapshot_job(job_id)
             if snapshot is None:
-                self.send_json({"error": "Job non trovato"}, HTTPStatus.NOT_FOUND)
+                self.send_json({"error": "Job not found"}, HTTPStatus.NOT_FOUND)
             else:
                 self.send_json(snapshot)
             return
@@ -492,7 +492,7 @@ class AppHandler(SimpleHTTPRequestHandler):
         try:
             payload = read_json_body(self)
         except json.JSONDecodeError:
-            self.send_json({"error": "JSON non valido"}, HTTPStatus.BAD_REQUEST)
+            self.send_json({"error": "Invalid JSON"}, HTTPStatus.BAD_REQUEST)
             return
         job_id = uuid.uuid4().hex
         if bool(payload.get("previewOnly", False)):
@@ -502,7 +502,7 @@ class AppHandler(SimpleHTTPRequestHandler):
                     jobs[job_id] = Job(
                         id=job_id,
                         status="done",
-                        progress="Completato",
+                        progress="Completed",
                         files=[cached_preview],
                         request=payload,
                     )

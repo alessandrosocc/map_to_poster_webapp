@@ -1,4 +1,11 @@
+<p>
+  <img src="assets/home.png" alt="MapToPoster homepage screenshot" width="920">
+</p>
+
 # MapToPoster Webapp, a local graphical interface based on [originalankur/maptoposter](https://github.com/originalankur/maptoposter)
+
+**Open the app locally:** run `./start.sh`, then open
+[`http://127.0.0.1:8080`](http://127.0.0.1:8080).
 
 This repository adds a local webapp to the MapToPoster cartographic poster
 generator. The goal is to make the original project easier to use: choose a
@@ -9,6 +16,33 @@ The generation logic is still centered on the original
 [`originalankur/maptoposter`](https://github.com/originalankur/maptoposter)
 work; this version adds a UI, local caches, print presets, a homepage with
 examples, and management tools.
+
+## Studio Preview
+
+The studio is the main generation interface: choose a city, adjust the output,
+select a theme, and download the final poster.
+
+<p>
+  <img src="assets/studio.png" alt="MapToPoster studio screenshot" width="780">
+</p>
+
+## Poster Examples
+
+<p>
+  <img src="posters/singapore_neon_cyberpunk_20260118_153328.png" width="180" alt="Singapore neon cyberpunk poster">
+  <img src="posters/dubai_midnight_blue_20260118_140807.png" width="180" alt="Dubai midnight blue poster">
+  <img src="posters/barcelona_warm_beige_20260118_140048.png" width="180" alt="Barcelona warm beige poster">
+  <img src="posters/tokyo_japanese_ink_20260118_142446.png" width="180" alt="Tokyo japanese ink poster">
+</p>
+
+More homepage examples:
+
+| City | Theme | Preview |
+|------|-------|---------|
+| San Francisco | Sunset | <img src="posters/san_francisco_sunset_20260118_144726.png" width="160" alt="San Francisco sunset poster"> |
+| Venice | Blueprint | <img src="posters/venice_blueprint_20260118_140505.png" width="160" alt="Venice blueprint poster"> |
+| Mumbai | Contrast Zones | <img src="posters/mumbai_contrast_zones_20260118_145843.png" width="160" alt="Mumbai contrast zones poster"> |
+| Seattle | Emerald | <img src="posters/seattle_emerald_20260124_162244.png" width="160" alt="Seattle emerald poster"> |
 
 ## Main Features
 
