@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MapToPoster Studio</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="tooltip-popover" id="tooltip-popover" role="tooltip" hidden></div>
+    <main class="app-shell">
+      <section class="studio">
+        <div class="panel controls">
+          <div class="brand">
+            <span class="brand-mark">M</span>
+            <div>
+              <h1>MapToPoster Studio</h1>
+              <p>Generatore locale di poster urbani</p>
+            </div>
+          </div>
+
+          <form id="poster-form">
+            <div class="field-grid two">
+              <label>
+                <span class="field-label">Citta <button type="button" class="help-tip" data-tooltip="Nome usato per cercare la citta su OpenStreetMap e per nominare il file.">?</button></span>
+                <input name="city" value="New York" autocomplete="address-level2" required>
+              </label>
+              <label>
+                <span class="field-label">Paese <button type="button" class="help-tip" data-tooltip="Aiuta la ricerca geografica a trovare la citta corretta, soprattutto se esistono omonimi.">?</button></span>
+                <input name="country" value="USA" autocomplete="country-name" required>
+              </label>
+            </div>
+
+            <div class="field-grid two">
+              <label>
+                <span class="field-label">Nome in poster <button type="button" class="help-tip" data-tooltip="Sostituisce il nome della citta stampato nel poster, senza cambiare la posizione cercata.">?</button></span>
+                <input name="displayCity" placeholder="opzionale">
+              </label>
+              <label>
+                <span class="field-label">Paese in poster <button type="button" class="help-tip" data-tooltip="Sostituisce il testo del paese mostrato nel poster. Utile per traduzioni o nomi personalizzati.">?</button></span>
+                <input name="displayCountry" placeholder="opzionale">
+              </label>
+            </div>
+
+            <label>
+              <span class="field-label">Etichetta paese alternativa <button type="button" class="help-tip" data-tooltip="Fallback per il testo del paese nel poster se non compili Paese in poster.">?</button></span>
+              <input name="countryLabel" placeholder="opzionale">
+            </label>
+
+            <div class="field-grid two">
+              <label>
+                <span class="field-label">Latitudine <button type="button" class="help-tip" data-tooltip="Centro manuale della mappa. Compilala insieme alla longitudine per saltare la ricerca automatica.">?</button></span>
+                <input name="latitude" inputmode="decimal" placeholder="opzionale">
+              </label>
+              <label>
+                <span class="field-label">Longitudine <button type="button" class="help-tip" data-tooltip="Centro manuale della mappa. Compilala insieme alla latitudine.">?</button></span>
+                <input name="longitude" inputmode="decimal" placeholder="opzionale">
+              </label>
+            </div>
+
+            <div class="slider-row">
+              <label>
+                <span class="field-label">Distanza <strong id="distance-value">18000 m</strong> <button type="button" class="help-tip" data-tooltip="Raggio della mappa in metri: valori piccoli mostrano il centro, valori grandi includono piu quartieri.">?</button></span>
+                <input type="range" name="distance" min="1000" max="50000" step="500" value="18000">
+              </label>
+              <button type="button" class="inline-action" id="reset-distance">Reset distanza</button>
+            </div>
+
+            <div class="field-grid two">
+              <label>
+                <span class="field-label">Larghezza <button type="button" class="help-tip" data-tooltip="Larghezza fisica del poster in pollici. Incide su proporzioni e risoluzione finale.">?</button></span>
+                <input name="width" type="number" min="1" max="50" step="0.1" value="12">
+              </label>
+              <label>
+                <span class="field-label">Altezza <button type="button" class="help-tip" data-tooltip="Altezza fisica del poster in pollici. Usa valori proporzionati al formato che vuoi stampare.">?</button></span>
+                <input name="height" type="number" min="1" max="50" step="0.1" value="16">
+              </label>
+            </div>
+
+            <div class="size-picker" aria-label="Formato carta">
+              <span class="field-label">Formato carta <button type="button" class="help-tip" data-tooltip="Imposta automaticamente larghezza e altezza in pollici per i formati ISO verticali. Consigliato PDF per A0 e A1.">?</button></span>
+              <div class="size-options">
+                <button type="button" class="size-option" data-width="33.1" data-height="46.8">A0</button>
+                <button type="button" class="size-option" data-width="23.4" data-height="33.1">A1</button>
+                <button type="button" class="size-option" data-width="11.7" data-height="16.5">A3</button>
+                <button type="button" class="size-option" data-width="8.3" data-height="11.7">A4</button>
+              </div>
+            </div>
+
+            <input type="hidden" name="format" value="pdf">
+            <div class="format-picker" role="radiogroup" aria-label="Formato output">
+              <span class="field-label">Formato <button type="button" class="help-tip" data-tooltip="Scegli il tipo di file da scaricare. Consigliato: PDF per qualita migliore in stampa e maggiore nitidezza.">?</button></span>
+              <div class="format-options">
+                <button type="button" class="format-option" data-format="png" aria-pressed="false">PNG</button>
+                <button type="button" class="format-option selected" data-format="pdf" aria-pressed="true">PDF</button>
+                <button type="button" class="format-option" data-format="svg" aria-pressed="false">SVG</button>
+              </div>
+            </div>
+
+            <label>
+              <span class="field-label">Font Google <button type="button" class="help-tip" data-tooltip="Nome di una famiglia Google Fonts da usare per i testi, per esempio Noto Sans JP o Cairo.">?</button></span>
+              <input name="fontFamily" placeholder="Noto Sans JP, Cairo, Open Sans">
+            </label>
+
+            <div class="theme-header">
+              <span class="field-label">Tema <button type="button" class="help-tip" data-tooltip="Palette grafica del poster. Cliccando un tema viene generata una preview reale a destra.">?</button></span>
+              <label class="toggle">
+                <input type="checkbox" name="allThemes">
+                <span class="field-label">Tutti i temi <button type="button" class="help-tip" data-tooltip="Se attivo, quando scegli un tema genera tutti i temi e prepara uno ZIP. La preview principale mostra il primo file prodotto.">?</button></span>
+              </label>
+            </div>
+            <div id="theme-grid" class="theme-grid"></div>
+          </form>
+        </div>
+
+        <div class="preview-area">
+          <section class="poster-stage" aria-live="polite">
+            <div class="poster-preview" id="poster-preview">
+              <div class="map-lines"></div>
+              <div class="poster-copy">
+                <span id="preview-city">N E W   Y O R K</span>
+                <i></i>
+                <small id="preview-country">USA</small>
+              </div>
+            </div>
+            <div class="preview-loading" id="preview-loading" hidden>
+              <span></span>
+              <strong>Stiamo generando l'immagine</strong>
+              <small>La preview apparira qui appena pronta.</small>
+            </div>
+          </section>
+
+          <section class="panel results">
+            <div>
+              <h2>Output</h2>
+              <p id="status">Pronto</p>
+            </div>
+            <div id="download-area" class="download-area"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

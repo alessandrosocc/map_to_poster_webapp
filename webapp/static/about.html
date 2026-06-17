@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cos'è MapToPoster</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="about-body">
+    <main class="about-shell">
+      <nav class="about-nav">
+        <a href="/">Home</a>
+        <a href="/studio">Apri lo studio</a>
+      </nav>
+
+      <section class="about-hero">
+        <div class="about-copy">
+          <span class="about-kicker">Interfaccia grafica locale</span>
+          <h1>Mappe urbane trasformate in poster, senza usare la riga di comando.</h1>
+          <p>
+            Questa webapp ti permette di scegliere città, tema, formato carta,
+            output e font da un'interfaccia visuale. Genera preview, salva file
+            in PDF, PNG o SVG e può creare uno ZIP con tutti i temi.
+          </p>
+          <div class="home-actions">
+            <a class="home-cta" href="/studio">Inizia a creare</a>
+            <a class="home-cta secondary" href="/">Guarda esempi</a>
+          </div>
+        </div>
+
+        <div class="about-map" aria-hidden="true">
+          <div></div>
+        </div>
+      </section>
+
+      <section class="about-band">
+        <article>
+          <h2>Da dove nasce</h2>
+          <p>
+            Questo progetto è semplicemente un'interfaccia grafica costruita
+            sopra il lavoro originale
+            <a href="https://github.com/originalankur/maptoposter" target="_blank" rel="noreferrer">originalankur/maptoposter</a>.
+            L'obiettivo è rendere più immediata la generazione dei poster,
+            mantenendo il cuore dell'idea: trasformare i dati geografici di una
+            città in una composizione stampabile.
+          </p>
+        </article>
+
+        <article>
+          <h2>Cosa puoi fare</h2>
+          <p>
+            Puoi cambiare città, distanza, proporzioni, preset A0/A1/A3/A4,
+            tema visivo e formato finale. La preview viene rigenerata mentre
+            modifichi le impostazioni, così capisci subito che tipo di poster
+            stai preparando.
+          </p>
+        </article>
+
+        <article>
+          <h2>Come lavora</h2>
+          <p>
+            La webapp usa cache locali per città e preview quando possibile,
+            così le modifiche ripetute sono più rapide. Quando una città non
+            viene trovata, puoi inserire manualmente latitudine e longitudine.
+          </p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
